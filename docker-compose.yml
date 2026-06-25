@@ -1,0 +1,37 @@
+services:
+  postgresql:
+    image: postgres:18.4-alpine
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+    - "5432:5432"
+  pinecone:
+    image: ghcr.io/pinecone-io/pinecone-local:latest
+    restart: always
+    environment: 
+      PORT: 5080
+      PINECONE_HOST: localhost
+    ports: 
+      - "5080-5090:5080-5090"
+    platform: linux/amd64
+  backend:
+    build: ./backend
+    restart: always
+    depends_on:
+      - postgresql
+      - pinecone
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+  frontend:
+    build: ./frontend
+    restart: always
+    depends_on:
+      - backend
+    environment:
+      API_HOST: http://host.docker.internal:8000
+    ports:
+      - "3000:3000"
