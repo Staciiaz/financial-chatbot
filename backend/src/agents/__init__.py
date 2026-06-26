@@ -71,7 +71,8 @@ class OrchestratorAgent:
         Generates sub-questions based on the main question and the list of available companies.
         """
         company_names = await self.financial_repo.list_company_names()
-        response = await self.questioner_llm.ainvoke(
+        structured_llm = self.questioner_llm.with_structured_output(QuestionerResponse)
+        response: QuestionerResponse = await structured_llm.ainvoke(
             input=[
                 HumanMessage(
                     content=QUESTIONER_PROMPT.format(
@@ -80,9 +81,7 @@ class OrchestratorAgent:
                     )
                 ),
             ],
-            response_format=QuestionerResponse,
         )
-        questioner_response = QuestionerResponse.model_validate_json(str(response.text))
         return {
             "sub_questions": [
                 SubQuestion(
@@ -92,7 +91,7 @@ class OrchestratorAgent:
                     has_financial_data=q.company in company_names,
                     has_document=q.company in ["Google", "Amazon", "Apple", "Meta"], # Only these companies have documents in the database for now
                 )
-                for q in questioner_response.sub_questions
+                for q in response.sub_questions
             ]
         }
     
