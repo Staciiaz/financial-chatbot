@@ -1,3 +1,5 @@
+from datetime import UTC, datetime, timedelta
+
 import bcrypt
 import jwt
 
@@ -16,8 +18,14 @@ class AuthService:
         self.user_repo = user_repo
 
     def generate_jwt_token(self, payload: dict) -> str:
-        token = jwt.encode(payload, self.config.jwt_secret_key, algorithm="HS256")
-        return token
+        return jwt.encode(
+            {
+                **payload,
+                "exp": datetime.now(UTC) + timedelta(minutes=3), # Set token expiration time to 3 minutes
+            },
+            self.config.jwt_secret_key,
+            algorithm="HS256",
+        )
     
     def validate_jwt_token(self, token: str) -> dict:
         try:
