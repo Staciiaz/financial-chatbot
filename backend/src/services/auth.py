@@ -36,7 +36,10 @@ class AuthService:
         except jwt.InvalidTokenError:
             raise ValueError("Invalid token")
 
-    async def register(self, username: str, password: str, company: str, sector: str) -> None:
+    async def register(self, username: str, password: str, company: str, sector: str, secret_key: str) -> None:
+        # Verify the secret key
+        if secret_key != self.config.jwt_secret_key:
+            raise ValueError("Invalid secret key")
         # Hash the password
         password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         # Create a new user
