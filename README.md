@@ -1,6 +1,6 @@
 # financial-chatbot
 
-A financial chatbot application built with a Python (FastAPI) backend and a TypeScript (Next.JS) frontend, orchestrated with Docker Compose. The project integrates with OpenAI for chat completions and LangSmith for tracing/observability, and uses Pinecone and Postgres as backing data stores (set up via migration scripts).
+A financial chatbot application built with a Python (FastAPI) backend and a TypeScript (Next.js) frontend, orchestrated with Docker Compose. The project integrates with OpenAI for chat completions and LangSmith for tracing/observability, and uses Pinecone and Postgres as backing data stores (set up via migration scripts).
 
 ## Project Structure
 
@@ -20,8 +20,8 @@ financial-chatbot/
 
 ## Tech Stack
 
-- **Backend:** Python, FastAPI
-- **Frontend:** TypeScript, Next.JS
+- **Backend:** Python (FastAPI)
+- **Frontend:** TypeScript (Next.js)
 - **Infrastructure:** Docker, Docker Compose
 - **LLM Provider:** OpenAI
 - **Observability:** LangSmith
