@@ -30,7 +30,7 @@ class DocumentRepository:
         )
 
     async def initialize(self):
-        self.dense_index = await self.pc.index("dense-index", host=f"{self.config.pinecone.host}:{self.config.pinecone.port+1}")
+        self.dense_index = await self.pc.index(host=self.config.pinecone.index_host)
 
     async def close(self):
         await self.dense_index.close()
