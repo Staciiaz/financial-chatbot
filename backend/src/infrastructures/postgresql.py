@@ -32,9 +32,8 @@ class PostgresqlClient:
                 await session.close()
 
     async def initialize(self):
-        self.engine = create_async_engine(
-            f"postgresql+asyncpg://{self.config.postgresql.user}:{self.config.postgresql.password}@{self.config.postgresql.host}:{self.config.postgresql.port}/{self.config.postgresql.database}",
-        )
+        conn_str = f"postgresql+asyncpg://{self.config.postgresql.user}:{self.config.postgresql.password}@{self.config.postgresql.host}:{self.config.postgresql.port}/{self.config.postgresql.database}"
+        self.engine = create_async_engine(conn_str)
         # Create the tables in the database if they don't exist
         async with self.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
