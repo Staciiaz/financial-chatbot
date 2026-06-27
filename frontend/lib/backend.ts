@@ -12,9 +12,5 @@ export function getBackendHost(): string {
       "API_HOST is not set. Add it to your environment (.env.local or docker-compose) — it should be the backend's address as seen from inside this server, e.g. http://backend:8000."
     );
   }
-  // Render's fromService hostport gives a bare host[:port] without scheme.
-  if (host.startsWith("http://") || host.startsWith("https://")) {
-    return host;
-  }
-  return `https://${host}`;
+  return host;
 }

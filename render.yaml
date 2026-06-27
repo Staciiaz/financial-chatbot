@@ -16,8 +16,3 @@ services:
     plan: free
     envVars:
       - fromGroup: financial-chatbot
-      - key: API_HOST
-        fromService:
-          name: financial-chatbot-backend
-          type: web
-          property: hostport
