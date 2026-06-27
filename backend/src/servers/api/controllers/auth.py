@@ -15,7 +15,6 @@ class AuthController:
 
     async def register(
         self,
-        api_key: Annotated[str, Header(min_length=6, max_length=100)],
         dto: Annotated[AuthRegisterDTO, Body()],
     ):
         await self.auth_svc.register(
@@ -23,7 +22,6 @@ class AuthController:
             password=dto.password,
             company=dto.company,
             sector=dto.sector,
-            secret_key=api_key,
         )
         return {"message": "Registration successful"}
 
@@ -37,6 +35,13 @@ class AuthController:
         )
         return {"message": "Login successful", "data": response}
     
+    async def logout(
+        self,
+        authorization: Annotated[str, Header(min_length=8, pattern=r"^Bearer\s.+")],
+    ):
+        await self.auth_svc.logout(authorization[7:]) # Remove "Bearer " prefix
+        return {"message": "Logout successful"}
+
     async def refresh(
         self,
         authorization: Annotated[str, Header(min_length=8, pattern=r"^Bearer\s.+")],

@@ -34,6 +34,7 @@ class APIServer:
         auth = APIRouter(prefix="/auth")
         auth.add_api_route("/register", self.auth_ctrl.register, methods=["POST"])
         auth.add_api_route("/login", self.auth_ctrl.login, methods=["POST"])
+        auth.add_api_route("/logout", self.auth_ctrl.logout, methods=["POST"])
         auth.add_api_route("/refresh", self.auth_ctrl.refresh, methods=["POST"])
         self.public_api.include_router(auth)
 
