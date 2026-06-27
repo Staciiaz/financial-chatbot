@@ -109,7 +109,7 @@ class AuthService:
         # Store the session in Redis with an expiration time
         pipe = self.redis.pipeline()
         pipe.hset(f"session:{session_id}", mapping={
-            "user_id": str(user.username),
+            "username": str(user.username),
             "access_token": access_token,
             "refresh_token": refresh_token,
         })

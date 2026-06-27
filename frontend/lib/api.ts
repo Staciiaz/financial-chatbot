@@ -46,7 +46,12 @@ function isTokenExpired(): boolean {
   if (typeof window === "undefined") return false;
   const raw = localStorage.getItem(TOKEN_EXPIRY_KEY);
   if (!raw) return false;
-  return Date.now() >= Number(raw) - EXPIRY_BUFFER_MS;
+  const expiresAt = Number(raw);
+  if (!Number.isFinite(expiresAt)) {
+    localStorage.removeItem(TOKEN_EXPIRY_KEY);
+    return false;
+  }
+  return Date.now() >= expiresAt - EXPIRY_BUFFER_MS;
 }
 
 export async function registerRequest(payload: RegisterPayload): Promise<void> {

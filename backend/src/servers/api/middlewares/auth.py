@@ -27,7 +27,7 @@ class AuthMiddleware:
                 session_id, payload = await self.auth_svc.validate_token(token)
                 scope["authenticated"] = {
                     "session_id": session_id,
-                    "user_id": payload.get("user_id"),
+                    "username": payload.get("username"),
                 }
             except Exception as e:
                 response = JSONResponse(
