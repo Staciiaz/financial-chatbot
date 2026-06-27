@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: financial-chatbot-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    envVars:
+      - fromGroup: financial-chatbot
+
+  - type: web
+    name: financial-chatbot-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    envVars:
+      - fromGroup: financial-chatbot
+      - key: API_HOST
+        fromService:
+          name: financial-chatbot-backend
+          type: web
+          property: host
+          scheme: https
