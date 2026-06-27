@@ -10,7 +10,7 @@ from ..infrastructures.redis import RedisClient
 from ..models.auth import AuthLoginResponse
 from ..models.user import User
 from ..repositories.user import UserRepository
-from ..types import UnauthorizedError
+from ..types import ForbiddenError, UnauthorizedError
 
 TokenType = Literal["access", "refresh"]
 
@@ -79,6 +79,10 @@ class AuthService:
             raise UnauthorizedError("Invalid token")
 
     async def register(self, username: str, password: str, company: str, sector: str) -> None:
+        # Check if registration is enabled
+        if not self.config.enable_registration:
+            raise ForbiddenError("Registration is disabled")
+
         # Hash the password
         password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         # Create a new user

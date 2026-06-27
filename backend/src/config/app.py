@@ -42,3 +42,8 @@ class AppConfig(BaseSettings):
     openai_api_key: str = Field(
         description="The API key for authenticating with the OpenAI service.",
     )
+
+    enable_registration: bool = Field(
+        default=True,
+        description="Whether user registration is enabled.",
+    )
