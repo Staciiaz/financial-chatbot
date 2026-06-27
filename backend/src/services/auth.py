@@ -48,18 +48,31 @@ class AuthService:
         )
         return token, int(expiration.total_seconds())
     
-    def _validate_token(
+    async def validate_token(
         self, 
         token: str,
         token_type: TokenType = "access",
-    ) -> dict:
+    ) -> tuple[str, dict]:
         try:
             if token_type not in self.token_types:
                 raise ValueError("Invalid token type")
             
             secret, _ = self.token_types[token_type]
             payload = jwt.decode(token, key=secret, algorithms=["HS256"])
-            return payload
+            session_id = payload.get("session_id")
+            if not session_id:
+                raise UnauthorizedError(f"Invalid {token_type} token")
+            
+            # Check if the session exists in Redis
+            session = await self.redis.hgetall(f"session:{session_id}")
+            if not session:
+                raise UnauthorizedError("Session expired")
+            
+            # Check if the provided access token matches the one stored in Redis
+            if session.get(f"{token_type}_token") != token:
+                raise UnauthorizedError(f"Invalid {token_type} token")
+            
+            return session_id, session
         except jwt.ExpiredSignatureError:
             raise UnauthorizedError("Token has expired")
         except jwt.InvalidTokenError:
@@ -111,8 +124,7 @@ class AuthService:
     
     async def logout(self, refresh_token: str) -> None:
         # Validate the refresh token
-        payload = self._validate_token(refresh_token, token_type="refresh")
-        session_id = payload.get("session_id")
+        session_id, payload = await self.validate_token(refresh_token, token_type="refresh")
         if not session_id:
             raise UnauthorizedError("Invalid refresh token")
 
@@ -121,23 +133,12 @@ class AuthService:
 
     async def refresh_token(self, refresh_token: str) -> AuthLoginResponse:
         # Validate the refresh token
-        payload = self._validate_token(refresh_token, token_type="refresh")
-        session_id = payload.get("session_id")
-        if not session_id:
-            raise UnauthorizedError("Invalid refresh token")
-        
-        # Check if the session exists in Redis
-        session = await self.redis.hgetall(f"session:{session_id}")
-        if not session:
-            raise UnauthorizedError("Session expired")
-        
-        # Check if the provided refresh token matches the one stored in Redis
-        if session.get("refresh_token") != refresh_token:
-            raise UnauthorizedError("Invalid refresh token")
+        session_id, session = await self.validate_token(refresh_token, token_type="refresh")
 
         # Generate new tokens and update the session in Redis
-        new_access_token, new_access_expires_in = self._generate_token(payload, token_type="access")
-        new_refresh_token, new_refresh_expires_in = self._generate_token(payload, token_type="refresh")
+        jwt_payload = {"session_id": session_id}
+        new_access_token, new_access_expires_in = self._generate_token(jwt_payload, token_type="access")
+        new_refresh_token, new_refresh_expires_in = self._generate_token(jwt_payload, token_type="refresh")
         pipe = self.redis.pipeline()
         pipe.hset(f"session:{session_id}", mapping={
             "access_token": new_access_token,
