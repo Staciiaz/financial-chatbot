@@ -20,5 +20,4 @@ services:
         fromService:
           name: financial-chatbot-backend
           type: web
-          property: host
-          scheme: https
+          property: url
