@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
-import { getBackendToken } from "@/lib/auth";
+import { getAccessToken } from "@/lib/auth";
 
 export default function Home() {
-  const token = getBackendToken();
+  const token = getAccessToken();
   redirect(token ? "/chat" : "/login");
 }

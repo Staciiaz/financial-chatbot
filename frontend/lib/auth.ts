@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 
-export const SESSION_COOKIE_NAME = "backend_token";
 export const USERNAME_COOKIE_NAME = "username";
+export const ACCESS_TOKEN_COOKIE_NAME = "user_access_token";
+export const REFRESH_TOKEN_COOKIE_NAME = "user_refresh_token";
 
 const SEVEN_DAYS_SECONDS = 60 * 60 * 24 * 7;
 
@@ -27,8 +28,12 @@ export const usernameCookieOptions = {
  * Reads the backend auth token from the request's cookies.
  * Use only in Server Components, Route Handlers, or Server Actions.
  */
-export function getBackendToken(): string | null {
-  return cookies().get(SESSION_COOKIE_NAME)?.value ?? null;
+export function getAccessToken(): string | null {
+  return cookies().get(ACCESS_TOKEN_COOKIE_NAME)?.value ?? null;
+}
+
+export function getRefreshToken(): string | null {
+  return cookies().get(REFRESH_TOKEN_COOKIE_NAME)?.value ?? null;
 }
 
 export function getStoredUsername(): string | null {

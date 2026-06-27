@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
-import { getBackendToken, getStoredUsername } from "@/lib/auth";
+import { getAccessToken, getStoredUsername } from "@/lib/auth";
 import ChatClient from "./ChatClient";
 
 export default function ChatPage() {
-  const token = getBackendToken();
+  const token = getAccessToken();
   if (!token) {
     redirect("/login");
   }

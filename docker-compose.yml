@@ -1,4 +1,9 @@
 services:
+  redis:
+    image: redis:8.6-alpine
+    restart: always
+    ports:
+      - "6379:6379"
   postgresql:
     image: postgres:18.4-alpine
     restart: always
@@ -6,7 +11,7 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
     ports:
-    - "5432:5432"
+      - "5432:5432"
   pinecone:
     image: ghcr.io/pinecone-io/pinecone-local:latest
     restart: always
@@ -20,6 +25,7 @@ services:
     build: ./backend
     restart: always
     depends_on:
+      - redis
       - postgresql
       - pinecone
     env_file:

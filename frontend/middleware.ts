@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SESSION_COOKIE_NAME = "backend_token";
+const SESSION_COOKIE_NAME = "user_access_token";
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;

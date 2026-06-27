@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBackendHost } from "@/lib/backend";
-import { getBackendToken } from "@/lib/auth";
+import { getAccessToken } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {
-  const token = getBackendToken();
+  const token = getAccessToken();
   if (!token) {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }

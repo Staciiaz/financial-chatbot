@@ -1,6 +1,7 @@
-import orjson
 from starlette.responses import JSONResponse
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
+
+from ....types import UnauthorizedError
 
 
 class ErrorMiddleware:
@@ -31,13 +32,27 @@ class ErrorMiddleware:
                 # After successful execution, send the intercepted messages
                 for message in intercept_messages:
                     await send(message)
+            except ValueError as e:
+                # Handle ValueError as a 400 Bad Request error
+                response = JSONResponse(
+                    content={"message": "Bad Request", "error": str(e)},
+                    status_code=400,
+                )
+                await response(scope, receive, send)
+            except UnauthorizedError as e:
+                # Handle UnauthorizedError as a 401 Unauthorized error
+                response = JSONResponse(
+                    content={"message": "Unauthorized", "error": str(e)},
+                    status_code=401,
+                )
+                await response(scope, receive, send)
             except Exception as e:
-                # Handle the exception and return a JSON response
-                # Potential improvement: can separate the status code by exception type
+                # Handle other exceptions as a 500 Internal Server Error
                 response = JSONResponse(
                     content={"message": "Internal Server Error", "error": str(e)},
                     status_code=500,
                 )
                 await response(scope, receive, send)
+
         else:
             await self.app(scope, receive, send)

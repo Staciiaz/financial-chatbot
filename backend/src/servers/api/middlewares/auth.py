@@ -24,8 +24,11 @@ class AuthMiddleware:
                 if token_type.lower() != "bearer":
                     raise ValueError("Invalid token type")
                 
-                payload = self.auth_svc.validate_jwt_token(token)
-                scope["authenticated_user"] = payload # Store the payload in the scope for downstream use
+                session_id, payload = await self.auth_svc.validate_token(token)
+                scope["authenticated"] = {
+                    "session_id": session_id,
+                    "username": payload.get("username"),
+                }
             except Exception as e:
                 response = JSONResponse(
                     content={"message": "Invalid or expired token", "error": str(e)},

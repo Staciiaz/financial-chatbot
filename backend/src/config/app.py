@@ -1,8 +1,10 @@
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from .jwt import JwtConfig
 from .pinecone import PineconeConfig
 from .postgresql import PostgresqlConfig
+from .redis import RedisConfig
 
 
 class AppConfig(BaseSettings):
@@ -20,15 +22,18 @@ class AppConfig(BaseSettings):
         description="The port number for the server to listen on.",
     )
 
-    jwt_secret_key: str = Field(
-        description="The secret key used for signing and verifying JWT tokens.",
+    jwt: JwtConfig = Field(
+        default_factory=JwtConfig,
+        description="Configuration settings for JWT authentication.",
     )
-
+    redis: RedisConfig = Field(
+        default_factory=RedisConfig,
+        description="Configuration settings for the Redis service.",
+    )
     pinecone: PineconeConfig = Field(
         default_factory=PineconeConfig,
         description="Configuration settings for the Pinecone service.",
     )
-
     postgresql: PostgresqlConfig = Field(
         default_factory=PostgresqlConfig,
         description="Configuration settings for the PostgreSQL database.",
