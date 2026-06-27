@@ -31,8 +31,15 @@ class AuthController:
         self,
         dto: Annotated[AuthLoginDTO, Body()],
     ):
-        token = await self.auth_svc.login(
+        response = await self.auth_svc.login(
             username=dto.username,
             password=dto.password,
         )
-        return {"message": "Login successful", "token": token}
+        return {"message": "Login successful", "data": response}
+    
+    async def refresh(
+        self,
+        authorization: Annotated[str, Header(min_length=8, pattern=r"^Bearer\s.+")],
+    ):
+        response = await self.auth_svc.refresh_token(authorization[7:]) # Remove "Bearer " prefix
+        return {"message": "Token refreshed successfully", "data": response}

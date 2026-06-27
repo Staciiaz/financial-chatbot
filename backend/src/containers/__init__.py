@@ -2,6 +2,7 @@ from src.config.app import AppConfig
 
 from ..infrastructures.pinecone import PineconeClient
 from ..infrastructures.postgresql import PostgresqlClient
+from ..infrastructures.redis import RedisClient
 from ..repositories.document import DocumentRepository
 from ..repositories.financial import FinancialRepository
 from ..repositories.user import UserRepository
@@ -18,6 +19,7 @@ class Container:
         Potential improvement: Should use dependency injection library to manage components and their dependencies.
         """
         # Initialize infrastructures
+        self.redis_client = RedisClient(config)
         self.pinecone_client = PineconeClient(config)
         self.postgresql_client = PostgresqlClient(config)
         # Initialize repositories
@@ -37,6 +39,7 @@ class Container:
         )
         self.auth_svc = AuthService(
             config=config,
+            redis=self.redis_client,
             user_repo=self.user_repo,
         )
         self.agent_svc = AgentService(
@@ -49,6 +52,7 @@ class Container:
         Initialize the container and its components.
         """
         # Initialize infrastructures
+        await self.redis_client.initialize()
         await self.postgresql_client.initialize()
         # Initialize repositories
         await self.document_repo.initialize()
@@ -60,5 +64,6 @@ class Container:
         # Close repositories
         await self.document_repo.close()
         # Close infrastructures
+        await self.redis_client.close()
         await self.pinecone_client.close()
         await self.postgresql_client.close()
