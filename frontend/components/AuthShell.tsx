@@ -11,7 +11,7 @@ export default function AuthShell({
   title: string;
   subtitle: string;
   children: React.ReactNode;
-  footer: React.ReactNode;
+  footer?: React.ReactNode;
 }) {
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-[#0f0f14] flex items-center justify-center px-4 py-10">
