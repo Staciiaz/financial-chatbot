@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { getBackendToken, getStoredUsername } from "@/lib/auth";
+import { getAccessToken, getStoredUsername } from "@/lib/auth";
 
 export async function GET() {
-  const token = getBackendToken();
+  const token = getAccessToken();
   if (!token) {
     return NextResponse.json({ authenticated: false }, { status: 401 });
   }

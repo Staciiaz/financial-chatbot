@@ -1,21 +1,37 @@
 import { NextResponse } from "next/server";
-import { SESSION_COOKIE_NAME, USERNAME_COOKIE_NAME } from "@/lib/auth";
+import { getBackendHost } from "@/lib/backend";
+import {
+  ACCESS_TOKEN_COOKIE_NAME,
+  REFRESH_TOKEN_COOKIE_NAME,
+  USERNAME_COOKIE_NAME,
+  getRefreshToken,
+  sessionCookieOptions,
+  usernameCookieOptions,
+} from "@/lib/auth";
+
+const deleteCookieOptions = { maxAge: 0 };
+
+function clearSessionCookies(res: NextResponse) {
+  res.cookies.set(ACCESS_TOKEN_COOKIE_NAME, "", { ...sessionCookieOptions, ...deleteCookieOptions });
+  res.cookies.set(REFRESH_TOKEN_COOKIE_NAME, "", { ...sessionCookieOptions, ...deleteCookieOptions });
+  res.cookies.set(USERNAME_COOKIE_NAME, "", { ...usernameCookieOptions, ...deleteCookieOptions });
+}
 
 export async function POST() {
+  const token = getRefreshToken();
+
+  if (token) {
+    try {
+      await fetch(`${getBackendHost()}/api/auth/logout`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (err) {
+      console.error("Logout proxy error:", err);
+    }
+  }
+
   const res = NextResponse.json({ success: true });
-  res.cookies.set(SESSION_COOKIE_NAME, "", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 0,
-  });
-  res.cookies.set(USERNAME_COOKIE_NAME, "", {
-    httpOnly: false,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 0,
-  });
+  clearSessionCookies(res);
   return res;
 }
