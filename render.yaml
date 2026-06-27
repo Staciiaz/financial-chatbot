@@ -20,4 +20,4 @@ services:
         fromService:
           name: financial-chatbot-backend
           type: web
-          property: url
+          property: hostport
