@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: financial-chatbot-backend
+    name: financial-chatbot-api
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
@@ -9,7 +9,7 @@ services:
       - fromGroup: financial-chatbot
 
   - type: web
-    name: financial-chatbot-frontend
+    name: financial-chatbot-app
     runtime: docker
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: ./frontend
